@@ -24,10 +24,9 @@ int main(int argc, char* argv[]) {
    FILE searim = argv[1];
    char* images[MAX_IMAGES];
    int numImages = 0;
-   ListeimageBank( searim,images, &numImages);
-
+   ListeimageBank(searim,images, &numImages);
    int mempartage ;
-   mempartage = shmget(IPC_PRIVATE, numImages, IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR );//creer la memeoire partagees
+   mempartage = shmget(IPC_PRIVATE, numImages, IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR);//creer la memeoire partagees
    if (mempartage == -1) {
       perror("shmget");
       return 1;
