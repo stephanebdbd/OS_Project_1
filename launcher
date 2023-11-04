@@ -1,14 +1,29 @@
 
+
 #Le script lance img-search avec deux modes possibles: interactif et automatique pour lancer le programme.
+
+image=$2
 
 if [ $1 = -i ] || [ $1 = --interactive ]
 then
     #paramètres en fonction du mode interactif
     echo "Mode interactif"
+
+
 elif [ $1 = -a ] || [ $1 = --automatic ]
 then
     #paramètres en fonction du mode automatique
-    echo "Mode automatique"
+    if ! [ $3 ]
+    then
+        database_path=./img/
+    else
+        database_path=$3
+    fi
+
+    for compare_file in ./list-file $database_path
+    do
+        echo $compare_file
+    done
 else
     echo "Aucun mode trouvé"
 fi
