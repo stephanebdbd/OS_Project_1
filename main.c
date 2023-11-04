@@ -4,18 +4,16 @@
 #include <string.h>
 
 
-
 int main(int argc, char* argv[]) {
-   char* imgPaths[2];
-   int c=0;
-   for (int i=1; i < argc; i++){
-      if (strcmp(argv[i], "-v") != 0 && strlen(argv[i]) < 1000){
-         imgPaths[c] = argv[i];
-         if (argv[i][-1] != '\0'){
-            imgPaths[c][strlen(argv[i])] = '\0';
-         }
-         c++;
+   char* imgPaths[1];
+   imgPaths[0] = argv[0];
+   if (argc == 2 && strcmp(argv[0], "-v") != 0 && strlen(argv[1]) < 1000){
+      imgPaths[0] = argv[1];
+      if (argv[1][-1] != '\0'){
+         imgPaths[0][strlen(argv[1])] = '\0';
       }
+   } else {
+      return 0;
    }
    return 0;
 }
