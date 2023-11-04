@@ -15,5 +15,38 @@ int main(int argc, char* argv[]) {
    } else {
       return 0;
    }
-   return 0;
+   int fd[2]; // Stocker deux bouts de pipe
+   pipe(fd);
+
+
+
+} else { // processus enfant
+
 }
+
+
+   pid_t child1 = fork();
+   if (child1 > 0) {  // Père
+      close(fd[READ]); // ferme le descripteur de fichier en lecture
+      int x = 5;
+      write(fd[WRITE], &x, sizeof(int));// ecriture
+    } else if (child1 == 0) {  // Fils
+      close(fd[WRITE]); // ferme le descripteur de fichier en ecriture
+      int y;
+      read(fd[READ], &y, sizeof(int)); // lecture
+   } else {             // Erreur
+      perror("fork()");  // Affiche sur stderr "fork(): <description de l'erreur>"
+      return 1;
+   }
+   pid_t child2 = fork();
+   ..if (child2 == 0) {  // Fils
+      close(fd[WRITE]); // ferme le descripteur de fichier en ecriture
+      int y;
+      read(fd[READ], &y, sizeof(int)); // lecture
+   } else {             // Erreur
+      perror("fork()");  // Affiche sur stderr "fork(): <description de l'erreur>"
+      return 1;
+   }
+
+   return 0;
+   }
