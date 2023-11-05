@@ -15,9 +15,16 @@ int main(int argc, char* argv[]) {
    } else {
       return 0;
    }
-
-   
-   int fd[2]; // Stocker deux bouts de pipe
+   pid_t pid = fork();
+   char buffer[256];int i = 0;
+   printf("%d", i); i++;
+   execlp("bash", "bash", "list-file", "./img", NULL);
+   printf("%d", i); i++;
+   while (fgets(buffer, sizeof(buffer), stdin) != NULL){
+      printf("%s test", buffer);
+   }
+   printf("%d", i);
+   /*int fd[2]; // Stocker deux bouts de pipe
    pipe(fd);
 
    pid_t child1 = fork();
@@ -41,7 +48,6 @@ int main(int argc, char* argv[]) {
    } else {             // Erreur
       perror("fork()");  // Affiche sur stderr "fork(): <description de l'erreur>"
       return 1;
-   }
-
+   }*/
    return 0;
 }
