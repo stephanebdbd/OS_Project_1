@@ -1,6 +1,7 @@
 #include <stdio.h>      // printf, perror
 #include <sys/types.h>  // pid_t
 #include <unistd.h>     // fork
+#include <sys/wait.h>   // wait
 #include <string.h>
 
 
@@ -16,14 +17,24 @@ int main(int argc, char* argv[]) {
       return 0;
    }
    pid_t pid = fork();
-   char buffer[256];int i = 0;
-   printf("%d", i); i++;
-   execlp("bash", "bash", "list-file", "./img", NULL);
-   printf("%d", i); i++;
-   while (fgets(buffer, sizeof(buffer), stdin) != NULL){
-      printf("%s test", buffer);
+   if (pid==-1){
+      perror("fork()");
+      return 1;
    }
-   printf("%d", i);
+   else if (pid == 0){
+      execlp("bash", "bash", "list-file", "./img", NULL);
+      perror("execlp");
+      return 1;
+   }
+   else{
+      int status;
+      waitpid(pid, &status, 0);
+      }
+   char buffer[100]; int i = 0;
+   while (fgets(buffer, sizeof(buffer), stdin) != NULL){
+      printf("%s test\n", buffer);
+   }
+   printf("%d\n", i);
    /*int fd[2]; // Stocker deux bouts de pipe
    pipe(fd);
 
@@ -50,4 +61,4 @@ int main(int argc, char* argv[]) {
       return 1;
    }*/
    return 0;
-}
+   }
