@@ -15,15 +15,10 @@ int main(int argc, char* argv[]) {
    } else {
       return 0;
    }
+
+   
    int fd[2]; // Stocker deux bouts de pipe
    pipe(fd);
-
-
-
-} else { // processus enfant
-
-}
-
 
    pid_t child1 = fork();
    if (child1 > 0) {  // Père
@@ -39,7 +34,7 @@ int main(int argc, char* argv[]) {
       return 1;
    }
    pid_t child2 = fork();
-   ..if (child2 == 0) {  // Fils
+   if (child2 == 0) {  // Fils
       close(fd[WRITE]); // ferme le descripteur de fichier en ecriture
       int y;
       read(fd[READ], &y, sizeof(int)); // lecture
@@ -49,4 +44,4 @@ int main(int argc, char* argv[]) {
    }
 
    return 0;
-   }
+}
