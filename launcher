@@ -18,8 +18,8 @@ then
     then
         echo "Le chemin ne donne pas sur un fichier"
     else
-        ./img-search image $REPLY
-
+        ./img-search | $REPLY
+    fi
 
 
 elif [ $1 = -a ] || [ $1 = --automatic ]
@@ -31,9 +31,5 @@ then
     else
         database_path=$3
     fi
-
-    for compare_file in $(./list-file $database_path)
-    do
-        ./img-search.c image $compare_file
-    done
+    ./list-file $database_path | ./img-search image
 fi

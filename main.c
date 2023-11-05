@@ -18,6 +18,7 @@ int main(int argc, char* argv[]) {
       return 0;
    }
    char buffer[256];
+   printf("test helo\n");
    while (fgets(buffer, sizeof(buffer), stdin) != NULL){
       printf("%s test\n", buffer);
       }
