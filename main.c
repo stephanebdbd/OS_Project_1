@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
       printf("processus fils 1 créé. PID : %d\n", getpid());  //code à exécuter pour le fils
       return 0;
    }
-   else if (child1 == -1){                  // Erreur
+   else if (child1 <0){                  // Erreur
       perror("fork()");    // Affiche sur stderr "fork(): <description de l'erreur>"
       return 1;
    }
@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
       printf("processus fils 2 créé. PID : %d\n", getpid());  //code à exécuter pour le fils
       return 0;
    }
-   else if (child2 == -1){                  // Erreur
+   else if (child2 < -1){                  // Erreur
       perror("fork()");    // Affiche sur stderr "fork(): <description de l'erreur>"
       return 1;
    }
