@@ -3,42 +3,7 @@
 #include <unistd.h>     // fork
 #include <sys/wait.h>   // wait
 #include <string.h>     // strcmp & strlen
-#include <stdbool.h>
-bool bon_format(const char *buffer) {
-    int longueur = strlen(buffer);
 
-    // Vérifier si la chaîne commence par "./img/"
-    if (longueur < 8 || strncmp(buffer, "./img/", 6) != 0) {
-        return false;
-    }
-
-    // Vérifier si la chaîne se termine par ".bmp" (longueur totale doit être au moins 11)
-    if (longueur < 11 || strcmp(buffer + longueur - 4, ".bmp\n") != 0) {
-        return false;
-    }
-
-    // Extraire la valeur entre "img/" et ".bmp" et la convertir en entier
-    char valeur[4];
-    strncpy(valeur, buffer + 6, longueur - 11);
-    valeur[longueur - 10] = '\0';
-
-    // Convertir la chaîne en entier de manière personnalisée
-    int entier = 0;
-    for (int i = 0; valeur[i] != '\0'; i++) {
-        if (valeur[i] >= '0' && valeur[i] <= '9') {
-            entier = entier * 10 + (valeur[i] - '0');
-        } else {
-            return false; // Si un caractère n'est pas un chiffre, ce n'est pas un entier
-        }
-    }
-
-    // Vérifier si la valeur est entre 0 et 100
-    if (entier < 0 || entier > 100) {
-        return false;
-    }
-
-    return true;  // Le format est valide
-}
 
 int main(int argc, char* argv[]) {
    char* imgPaths[1];
@@ -75,19 +40,21 @@ int main(int argc, char* argv[]) {
       return 1;
    }
    
-   printf("\n");
-
    char buffer[256][100]; int i = 0;
    while (fgets(buffer[i], sizeof(buffer[i]), stdin) != NULL){
-      if (bon_format(buffer[i])==true){
-         printf("%s", buffer[i]); i++;
-      }else{
-         printf("mauvais format");
+      buffer[i][strlen(buffer[i])-1] = '\0';
+      if (access(buffer[i], F_OK) != -1){
+         i++;
       }
-      
+      else {
+         if (strlen(buffer[i]) == 0) {
+            break;
+         }
+         buffer[i][0] = '\0';
+      }
    }
    for (int j = 0; j<i; j++) {
-      printf("Fichier n°%d : %s", j+1, buffer[j]);
+      printf("Fichier n°%d : %s\n", j+1, buffer[j]);
    }
 
    printf("\n");
