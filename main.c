@@ -24,33 +24,34 @@ int main(int argc, char* argv[]) {
       i++;
       }
    for (int j = 0; j<i; j++) {
-      printf("Fichier n°%d : %s", j, buffer[j]);
+      printf("Fichier n°%d : %s", j+1, buffer[j]);
    }
 
-
+   printf("\n");
    pid_t child1, child2;
 
    child1 = fork();
    if (child1 == 0) {      // Fils
-      //code à exécuter pour le fils
+      printf("processus fils 1 créé. PID : %d\n", getpid());  //code à exécuter pour le fils
       return 0;
    }
-   else {                  // Erreur
+   else if (child1 == -1){                  // Erreur
       perror("fork()");    // Affiche sur stderr "fork(): <description de l'erreur>"
       return 1;
    }
 
    child2 = fork();
    if (child2 == 0) {      // Fils
-      // code à exécuter pour le fils
+      printf("processus fils 2 créé. PID : %d\n", getpid());  //code à exécuter pour le fils
       return 0;
    }
-   else {                  // Erreur
+   else if (child2 == -1){                  // Erreur
       perror("fork()");    // Affiche sur stderr "fork(): <description de l'erreur>"
       return 1;
    }
 
-   // code à exécuter pour le père
+   // code à exécuter pour le père : répartition des images, comparaison en exécution des processus concurrente
+   printf("PID du processus père : %d\n", getppid());
 
    return 0;
    }
