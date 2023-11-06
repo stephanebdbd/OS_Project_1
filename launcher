@@ -8,19 +8,10 @@ if [ $# = 0 ]
 then
     echo "Aucun mode trouvé"
 
-
-
 elif [ $1 = -i ] || [ $1 = --interactive ]
 then
     #paramètres en fonction du mode interactif
-    echo "Entrez le chemin d'une image : "
-    if ![ -f $REPLY ]
-    then
-        echo "Le chemin ne donne pas sur un fichier"
-    else
-        ./img-search | $REPLY
-    fi
-
+    ./img-search image
 
 elif [ $1 = -a ] || [ $1 = --automatic ]
 then

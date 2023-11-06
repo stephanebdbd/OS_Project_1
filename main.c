@@ -18,16 +18,6 @@ int main(int argc, char* argv[]) {
       return 0;
    }
 
-
-   char buffer[256][100]; int i = 0;
-   while (fgets(buffer[i], sizeof(buffer[i]), stdin) != NULL){
-      i++;
-      }
-   for (int j = 0; j<i; j++) {
-      printf("Fichier n°%d : %s", j+1, buffer[j]);
-   }
-
-   printf("\n");
    pid_t child1, child2;
 
    child1 = fork();
@@ -49,6 +39,28 @@ int main(int argc, char* argv[]) {
       perror("fork()");    // Affiche sur stderr "fork(): <description de l'erreur>"
       return 1;
    }
+   
+   printf("\n");
+
+   char buffer[256][100]; int i = 0;
+   while (fgets(buffer[i], sizeof(buffer[i]), stdin) != NULL){
+      if (access(buffer[i], F_OK) != -1){
+         printf("%s", buffer[i]); i++;
+      }
+      else {
+         if (buffer[i][0] == '\n') {
+            buffer[i][0] = "\0";
+            break;
+         } 
+         buffer[i][0] = "\0";
+      }
+   }
+   for (int j = 0; j<i; j++) {
+      printf("Fichier n°%d : %s", j+1, buffer[j]);
+   }
+
+   printf("\n");
+   
 
    // code à exécuter pour le père : répartition des images, comparaison en exécution des processus concurrente
    printf("PID du processus père : %d\n", getppid());
