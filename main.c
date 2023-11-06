@@ -3,6 +3,7 @@
 #include <unistd.h>     // fork
 #include <sys/wait.h>   // wait
 #include <string.h>     // strcmp & strlen
+#include <stdbool.h>
 bool bon_format(const char *buffer) {
     int longueur = strlen(buffer);
 
@@ -12,13 +13,13 @@ bool bon_format(const char *buffer) {
     }
 
     // Vérifier si la chaîne se termine par ".bmp" (longueur totale doit être au moins 11)
-    if (longueur < 11 || strcmp(buffer + longueur - 4, ".bmp") != 0) {
+    if (longueur < 11 || strcmp(buffer + longueur - 4, ".bmp\n") != 0) {
         return false;
     }
 
     // Extraire la valeur entre "img/" et ".bmp" et la convertir en entier
     char valeur[4];
-    strncpy(valeur, buffer + 6, longueur - 10);
+    strncpy(valeur, buffer + 6, longueur - 11);
     valeur[longueur - 10] = '\0';
 
     // Convertir la chaîne en entier de manière personnalisée
@@ -81,7 +82,7 @@ int main(int argc, char* argv[]) {
       if (bon_format(buffer[i])==true){
          printf("%s", buffer[i]); i++;
       }else{
-         printf("mauvais format")
+         printf("mauvais format");
       }
       
    }
