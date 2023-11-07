@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
       return 0;
    }
    
-   char buffer[256][100]; int i = 0;
+   char buffer[1024][100]; int i = 0;
    while (fgets(buffer[i], sizeof(buffer[i]), stdin) != NULL){
       i++;
    }
