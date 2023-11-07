@@ -1,5 +1,6 @@
 #!/bin/bash
 
+export PATH="$PATH:./img:./img-dist"
 #Le script lance img-search avec deux modes possibles: interactif et automatique pour lancer le programme.
 
 image=$2
@@ -7,26 +8,38 @@ image=$2
 if [ $# = 0 ]
 then
     echo "Aucun mode trouvé"
+elif ! [ -f $image ]
+then
+    echo "Ce chemin d'accès n'existe pas"
+elif [ $1 = -h ] || [ $1 = --help ]
+then
+    #paramètres en fonction du mode aide
+    echo "Usage: ./launcher [OPTION]... [IMAGE] [DATABASE_PATH]"
+    echo "Lance le programme img-search avec deux modes possibles: interactif et automatique."
+    echo "  -h, --help              Affiche l'aide et quitte"
+    echo "  -i, --interactive       Mode interactif"
+    echo "  -a, --automatic         Mode automatique"
+    echo "  IMAGE                   Chemin d'accès de l'image à comparer"
+    echo "  DATABASE_PATH           Chemin d'accès du dossier contenant les images à comparer"
+    echo "                          (par défaut: ./img/)"
+    echo "Exemples:"
+    echo "  ./launcher -i image"
+    echo "  ./launcher -a image ./img/"
+    echo "  ./launcher --help"
 
 elif [ $1 = -i ] || [ $1 = --interactive ]
 then
     #paramètres en fonction du mode interactif
-    ways=""
-    bool=true
-
-    while [ $bool == true ]; do
+    while true; do
         read -p "Entrez le chemin d'accès d'une image (cliquez sur Enter pour quitter) : " way
         if [ -f "$way" ]; then
-            ways="$ways $way"
+y            echo $way
         fi
         if [ -z "$way" ]; then
-            bool=false
+            break
         fi
-    done
-
-    for word in $ways ; do
-        echo $word
     done | ./img-search image
+
 
 elif [ $1 = -a ] || [ $1 = --automatic ]
 then

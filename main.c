@@ -22,7 +22,11 @@ int main(int argc, char* argv[]) {
    while (fgets(buffer[i], sizeof(buffer[i]), stdin) != NULL){
       i++;
    }
-
+   
+   if (i==0){
+      printf("\nAucune image n'a été transmise.\nProgramme terminé.\n");
+      return 1;
+   }
 
    for (int j = 0; j<i; j++) {
       printf("Fichier n°%d : %s", j+1, buffer[j]);
