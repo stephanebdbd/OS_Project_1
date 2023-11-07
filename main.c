@@ -1,12 +1,8 @@
 #include <stdio.h>      // printf, perror
 #include <sys/types.h>  // pid_t
-#include <stdlib.h>     //exit
 #include <unistd.h>     // fork
 #include <sys/wait.h>   // wait
 #include <string.h>     // strcmp & strlen
-
-#define READ 0
-#define WRITE 1
 
 
 int main(int argc, char* argv[]) {
@@ -39,53 +35,54 @@ int main(int argc, char* argv[]) {
 
    int taille = sizeof(buffer) / sizeof(buffer[0]);
 
-   int variable_gauche;
-   int variable_droite;
+   int pipe1[2], pipe2[2];
+
+   pid_t child1, child2;
+
+   if (pipe(pipe1) == -1 || pipe(pipe2) == -1) {
+      perror("Erreur");
+      exit(1); // Échec
+   }
+
+   child1 = fork();
+   if (child1 == -1) {
+      perror("Erreur");
+      exit(1); // Échec
+   }
+
+   if (child1 == 0) {
+      // Code du premier processus enfant
+      close(pipe1[WRITE]); // Fermez l'extrémité d'écriture du premier tube
+      char chemin_recu[100];
+      read(pipe1[READ], chemin_recu, sizeof(chemin_recu));
+      printf("enfant 1 pid(%d) chemin : %s", getpid(), chemin_recu);
+      close(pipe1[READ]); // Fermez l'extrémité de lecture du premier tube
+      exit(0); // Succès
+   }
+
+   child2 = fork();
+   if (child2 == -1) {
+      perror("Erreur");
+      exit(1); // Échec
+   }
+
+   if (child2 == 0) {
+      // Code du deuxième processus enfant
+      close(pipe2[WRITE]); // Fermez l'extrémité d'écriture du deuxième tube
+      char chemin_recu[100];
+      read(pipe2[READ], chemin_recu, sizeof(chemin_recu));
+      printf("enfant 2  pid (%d) chemin : %s", getpid(), chemin_recu);
+      close(pipe2[READ]); // Fermez l'extrémité de lecture du deuxième tube
+      exit(0); // Succès
+   }
+
 
    for (int i = 0; i < taille / 2; i++) {
-      int pipe1[2], pipe2[2];
+      
       char chemin1[] = buffer[i];
       char chemin2[]= buffer[taille - i - 1];
       
-      pid_t child1, child2;
-
-      if (pipe(pipe1) == -1 || pipe(pipe2) == -1) {
-         perror("Erreur");
-         exit(1); // Échec
-      }
-
-      child1 = fork();
-      if (child1 == -1) {
-         perror("Erreur");
-         exit(1); // Échec
-      }
-
-      if (child1 == 0) {
-         // Code du premier processus enfant
-         close(pipe1[WRITE]); // Fermez l'extrémité d'écriture du premier tube
-         char chemin_recu[100];
-         read(pipe1[READ], chemin_recu, sizeof(chemin_recu));
-         printf("enfant 1 pid(%d) chemin : %s", getpid(), chemin_recu);
-         close(pipe1[READ]); // Fermez l'extrémité de lecture du premier tube
-         exit(0); // Succès
-      }
-
-      child2 = fork();
-      if (child2 == -1) {
-         perror("Erreur");
-         exit(1); // Échec
-      }
-
-      if (child2 == 0) {
-         // Code du deuxième processus enfant
-         close(pipe2[WRITE]); // Fermez l'extrémité d'écriture du deuxième tube
-         char chemin_recu[100];
-         read(pipe2[READ], chemin_recu, sizeof(chemin_recu));
-         printf("enfant 2  pid (%d) chemin : %s", getpid(), chemin_recu);
-         close(pipe2[READ]); // Fermez l'extrémité de lecture du deuxième tube
-         exit(0); // Succès
-      }
-
+      
       // Code du processus parent
       close(pipe1[READ]); // Fermez l'extrémité de lecture du premier tube
       close(pipe2[READ]); // Fermez l'extrémité de lecture du deuxième tube
