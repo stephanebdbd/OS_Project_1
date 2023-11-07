@@ -55,8 +55,7 @@ int main(int argc, char* argv[]) {
    }
 
    if (child1 == 0) {
-      // Code du premier processus enfant
-      close(pipe1[WRITE]); // Fermez l'extrémité d'écriture du premier tube
+      close(pipe1[WRITE]); 
       char chemin_recu[100];
       read(pipe1[READ], chemin_recu, sizeof(chemin_recu));
       printf("enfant 1 pid(%d) chemin : %s", getpid(), chemin_recu);
@@ -71,12 +70,11 @@ int main(int argc, char* argv[]) {
    }
 
    if (child2 == 0) {
-      // Code du deuxième processus enfant
-      close(pipe2[WRITE]); // Fermez l'extrémité d'écriture du deuxième tube
+      close(pipe2[WRITE]); 
       char chemin_recu[100];
       read(pipe2[READ], chemin_recu, sizeof(chemin_recu));
       printf("enfant 2  pid (%d) chemin : %s", getpid(), chemin_recu);
-      close(pipe2[READ]); // Fermez l'extrémité de lecture du deuxième tube
+      close(pipe2[READ]); 
       exit(0); // Succès
    }
 
@@ -88,14 +86,14 @@ int main(int argc, char* argv[]) {
       
       
       // Code du processus parent
-      close(pipe1[READ]); // Fermez l'extrémité de lecture du premier tube
-      close(pipe2[READ]); // Fermez l'extrémité de lecture du deuxième tube
+      close(pipe1[READ]);
+      close(pipe2[READ]);
 
       write(pipe1[WRITE], chemin1, strlen(chemin1) + 1);
       write(pipe2[WRITE], chemin2, strlen(chemin2) + 1);
       
-      close(pipe1[WRITE]); // Fermez l'extrémité d'écriture du premier tube
-      close(pipe2[WRITE]); // Fermez l'extrémité d'écriture du deuxième tube
+      close(pipe1[WRITE]); 
+      close(pipe2[WRITE]);
 
       wait(NULL); // Attendez la fin des processus enfants
       wait(NULL);
