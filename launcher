@@ -1,4 +1,4 @@
-
+#!/bin/bash
 
 #Le script lance img-search avec deux modes possibles: interactif et automatique pour lancer le programme.
 
@@ -11,7 +11,22 @@ then
 elif [ $1 = -i ] || [ $1 = --interactive ]
 then
     #paramètres en fonction du mode interactif
-    ./img-search image
+    ways=""
+    bool=true
+
+    while [ $bool == true ]; do
+        read -p "Entrez le chemin d'accès d'une image (cliquez sur Enter pour quitter) : " way
+        if [ -f "$way" ]; then
+            ways="$ways $way"
+        fi
+        if [ -z "$way" ]; then
+            bool=false
+        fi
+    done
+
+    for word in $ways ; do
+        echo $word
+    done | ./img-search image
 
 elif [ $1 = -a ] || [ $1 = --automatic ]
 then
