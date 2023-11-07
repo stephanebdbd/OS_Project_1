@@ -1,9 +1,13 @@
 #include <stdio.h>      // printf, perror
 #include <sys/types.h>  // pid_t
+#include <stdlib.h>     //exit
 #include <unistd.h>     // fork
 #include <sys/wait.h>   // wait
 #include <string.h>     // strcmp & strlen
 
+
+#define READ 0
+#define WRITE 1
 
 int main(int argc, char* argv[]) {
    char* imgPaths[1];
