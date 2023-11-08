@@ -18,41 +18,81 @@ int main(int argc, char* argv[]) {
       return 0;
    }
    
-   char buffer[1024][100]; int i = 0;
+   char buffer[1024][100]; int taille = 0;
    while (fgets(buffer[i], sizeof(buffer[i]), stdin) != NULL){
-      i++;
+      taille++;
    } 
    
-   if (i==0){
+   if (taille==0){
       printf("No similar image found (no comparison could be performed successfully).\n");
       return 1;
    }
    
-//      for (int j = 0; j<i; j++) {
-//      printf("Fichier n°%d : %s", j+1, buffer[j]);
-//   }
+      for (int j = 0; j<taille; j++) {
+      printf("Fichier n°%d : %s", j+1, buffer[j]);
+   }
+
+   int pipe1[2], pipe2[2];
 
    pid_t child1, child2;
 
-   child1 = fork();
-   if (child1 == 0) {      // Fils
-      return 0;
+   if (pipe(pipe1) == -1 || pipe(pipe2) == -1) {
+      perror("Erreur");
+      exit(1); // Échec
    }
-   else if (child1 <0){                  // Erreur
-      perror("fork()");    // Affiche sur stderr "fork(): <description de l'erreur>"
-      return 1;
+
+   child1 = fork();
+   if (child1 == -1) {
+      perror("Erreur");
+      exit(1); // Échec
+   }
+
+   if (child1 == 0) {
+      close(pipe1[WRITE]); 
+      char chemin_recu[100];
+      read(pipe1[READ], chemin_recu, sizeof(chemin_recu));
+      printf("enfant 1 pid(%d) chemin : %s", getpid(), chemin_recu);
+      close(pipe1[READ]); // Fermez l'extrémité de lecture du premier tube
+      exit(0); // Succès
    }
 
    child2 = fork();
-   if (child2 == 0) {      // Fils
-      return 0;
-   }
-   else if (child2 < 0){                  // Erreur
-      perror("fork()");    // Affiche sur stderr "fork(): <description de l'erreur>"
-      return 1;
+   if (child2 == -1) {
+      perror("Erreur");
+      exit(1); // Échec
    }
 
-   // code à exécuter pour le père : répartition des images, comparaison en exécution des processus concurrente
+   if (child2 == 0) {
+      close(pipe2[WRITE]); 
+      char chemin_recu[100];
+      read(pipe2[READ], chemin_recu, sizeof(chemin_recu));
+      printf("enfant 2  pid (%d) chemin : %s", getpid(), chemin_recu);
+      close(pipe2[READ]); 
+      exit(0); // Succès
+   }
+
+
+   for (int i = 0; i < taille / 2; i++) {
+      
+      char chemin1[] = buffer[i];
+      char chemin2[]= buffer[taille - i - 1];
+      
+      
+      // Code du processus parent
+      close(pipe1[READ]);
+      close(pipe2[READ]);
+
+      write(pipe1[WRITE], chemin1, strlen(chemin1) + 1);
+      write(pipe2[WRITE], chemin2, strlen(chemin2) + 1);
+      
+      close(pipe1[WRITE]); 
+      close(pipe2[WRITE]);
+
+      wait(NULL); // Attendez la fin des processus enfants
+      wait(NULL);
+      }
+
+
 
    return 0;
    }
