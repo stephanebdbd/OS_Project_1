@@ -4,6 +4,8 @@
 #include <sys/wait.h>   // wait
 #include <string.h>     // strcmp & strlen
 
+#define READ 0
+#define WRITE 1
 
 int main(int argc, char* argv[]) {
    char* imgPaths[1];
