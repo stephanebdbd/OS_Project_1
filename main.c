@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
    }
    
    char buffer[1024][100]; int taille = 0;
-   while (fgets(buffer[i], sizeof(buffer[i]), stdin) != NULL){
+   while (fgets(buffer[taille], sizeof(buffer[taille]), stdin) != NULL){
       taille++;
    } 
    
