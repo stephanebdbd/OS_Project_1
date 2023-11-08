@@ -58,5 +58,5 @@ then
         ./list-file $database_path | ./img-search $image
     fi
 else
-    echo "No similar image found (no comparison could be performed successfully). 3"
+    echo "No similar image found (no comparison could be performed successfully)."
 fi
