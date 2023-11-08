@@ -1,16 +1,14 @@
 #!/bin/bash
 
-export PATH="$PATH:./img:./img-dist"
 #Le script lance img-search avec deux modes possibles: interactif et automatique pour lancer le programme.
-
+PATH="$PATH:./img:./img-dist"
 image=$2
 
-if [ $# = 0 ]
+
+if [ $# -lt 2 ] || [ $# -gt 3 ]
 then
-    echo "Aucun mode trouvé"
-elif ! [ -f $image ]
-then
-    echo "Ce chemin d'accès n'existe pas"
+    echo $#
+    echo "No similar image found (no comparison could be performed successfully)."
 elif [ $1 = -h ] || [ $1 = --help ]
 then
     #paramètres en fonction du mode aide
@@ -26,29 +24,39 @@ then
     echo "  ./launcher -i image"
     echo "  ./launcher -a image ./img/"
     echo "  ./launcher --help"
-
-elif [ $1 = -i ] || [ $1 = --interactive ]
+elif  [ -f "$image" ] || [ -f "./img/$image" ]
 then
-    #paramètres en fonction du mode interactif
-    while true; do
-        read -p "Entrez le chemin d'accès d'une image (cliquez sur Enter pour quitter) : " way
-        if [ -f "$way" ]; then
-y            echo $way
-        fi
-        if [ -z "$way" ]; then
-            break
-        fi
-    done | ./img-search image
-
-
-elif [ $1 = -a ] || [ $1 = --automatic ]
-then
-    #paramètres en fonction du mode automatique
-    if ! [ $3 ]
+    if [ -f "./img$image" ]
     then
-        database_path=./img/
-    else
-        database_path=$3
+        image="./img/$image"
     fi
-    ./list-file $database_path | ./img-search image
+    if [ $1 = -i ] || [ $1 = --interactive ]
+    then
+        #paramètres en fonction du mode interactif
+        while true; do
+            read -p "Entrez le chemin d'accès d'une image (cliquez sur Enter pour quitter) : " way
+            if [ -f "./img/$way" ]
+            then
+                echo "./img/$way"
+            elif [ -f "$way" ]
+            then
+                echo "$way"
+            elif [ -z "$way" ]
+            then
+                break
+            fi
+        done | ./img-search $image
+    elif [ $1 = -a ] || [ $1 = --automatic ]
+    then
+        #paramètres en fonction du mode automatique
+        if ! [ $3 ]
+        then
+            database_path=./img/
+        else
+            database_path=$3
+        fi
+        ./list-file $database_path | ./img-search $image
+    fi
+else
+    echo "No similar image found (no comparison could be performed successfully). 3"
 fi

@@ -21,24 +21,21 @@ int main(int argc, char* argv[]) {
    char buffer[1024][100]; int i = 0;
    while (fgets(buffer[i], sizeof(buffer[i]), stdin) != NULL){
       i++;
-   }
+   } 
    
    if (i==0){
-      printf("\nAucune image n'a été transmise.\nProgramme terminé.\n");
+      printf("No similar image found (no comparison could be performed successfully).\n");
       return 1;
    }
-
-   for (int j = 0; j<i; j++) {
-      printf("Fichier n°%d : %s", j+1, buffer[j]);
-   }
-
-   printf("\n");
    
+//      for (int j = 0; j<i; j++) {
+//      printf("Fichier n°%d : %s", j+1, buffer[j]);
+//   }
+
    pid_t child1, child2;
 
    child1 = fork();
    if (child1 == 0) {      // Fils
-      printf("processus fils 1 créé. PID : %d\n", getpid());  //code à exécuter pour le fils
       return 0;
    }
    else if (child1 <0){                  // Erreur
@@ -48,7 +45,6 @@ int main(int argc, char* argv[]) {
 
    child2 = fork();
    if (child2 == 0) {      // Fils
-      printf("processus fils 2 créé. PID : %d\n", getpid());  //code à exécuter pour le fils
       return 0;
    }
    else if (child2 < 0){                  // Erreur
@@ -57,7 +53,6 @@ int main(int argc, char* argv[]) {
    }
 
    // code à exécuter pour le père : répartition des images, comparaison en exécution des processus concurrente
-   printf("PID du processus père : %d\n", getppid());
 
    return 0;
    }
