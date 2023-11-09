@@ -3,56 +3,32 @@
 #include <unistd.h>     // fork
 #include <sys/wait.h>   // wait
 #include <string.h>     // strcmp & strlen
+#include <stdlib.h>     // exit
 
+#define READ 0
+#define WRITE 1
 
 int main(int argc, char* argv[]) {
    char* imgPaths[1];
    imgPaths[0] = argv[0];
    if (argc == 2 && strcmp(argv[0], "-v") != 0 && strlen(argv[1]) < 1000){
       imgPaths[0] = argv[1];
-      if (argv[1][-1] != '\0'){
-         imgPaths[0][strlen(argv[1])] = '\0';
-      }
    }
    else {
       return 0;
    }
    
-   char buffer[1024][100]; int i = 0;
-   while (fgets(buffer[i], sizeof(buffer[i]), stdin) != NULL){
-      i++;
+   char buffer[1024][100];
+
+   int taille = 0;
+   while (fgets(buffer[taille], sizeof(buffer[taille]), stdin) != NULL){
+      taille++;
    } 
    
-   if (i==0){
+   if (taille==0){
       printf("No similar image found (no comparison could be performed successfully).\n");
       return 1;
    }
-   
-//      for (int j = 0; j<i; j++) {
-//      printf("Fichier n°%d : %s", j+1, buffer[j]);
-//   }
-
-   pid_t child1, child2;
-
-   child1 = fork();
-   if (child1 == 0) {      // Fils
-      return 0;
-   }
-   else if (child1 <0){                  // Erreur
-      perror("fork()");    // Affiche sur stderr "fork(): <description de l'erreur>"
-      return 1;
-   }
-
-   child2 = fork();
-   if (child2 == 0) {      // Fils
-      return 0;
-   }
-   else if (child2 < 0){                  // Erreur
-      perror("fork()");    // Affiche sur stderr "fork(): <description de l'erreur>"
-      return 1;
-   }
-
-   // code à exécuter pour le père : répartition des images, comparaison en exécution des processus concurrente
 
    return 0;
-   }
+}
