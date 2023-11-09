@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
       close(pipe2[WRITE]);
       char chemin_recu[100];
       while (read(pipe1[READ], &chemin_recu, sizeof(chemin_recu))){
-         printf("enfant 1 pid (%d) chemin : %s\n", getpid(), chemin_recu);
+         printf("enfant 1 pid (%d) chemin : %s", getpid(), chemin_recu);
       }
       close(pipe1[READ]);
       exit(0);
@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
       close(pipe1[WRITE]);
       char chemin_recu[100];
       while (read(pipe2[READ], &chemin_recu, sizeof(chemin_recu))){
-         printf("enfant 2 pid (%d) chemin : %s\n", getpid(), chemin_recu);
+         printf("enfant 2 pid (%d) chemin : %s", getpid(), chemin_recu);
       }
       close(pipe2[READ]);
       exit(0);
