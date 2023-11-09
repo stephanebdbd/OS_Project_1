@@ -5,6 +5,11 @@ PATH="$PATH:./img:./img-dist"
 image=$2
 database_path=./img
 
+if [ $# -eq 3 ] && [ -d "$3" ]
+    then
+    database_path=$3
+fi
+
 if [ $# -lt 2 ] || [ $# -gt 3 ]
 then
     echo $#
@@ -24,20 +29,20 @@ then
     echo "  ./launcher -i image"
     echo "  ./launcher -a image ./img/"
     echo "  ./launcher --help"
-elif  [ -f "$image" ] || [ -f "./img/$image" ]
+elif  [ -f "$image" ] || [ -f "$database_path/$image" ]
 then
-    if [ -f "./img$image" ]
+    if [ -f "$database_path/$image" ]
     then
-        image="./img/$image"
+        image="$database_path/$image"
     fi
     if [ $1 = -i ] || [ $1 = --interactive ]
     then
         #paramètres en fonction du mode interactif
         while true; do
             read -p "Entrez le chemin d'accès d'une image (cliquez sur Enter pour quitter) : " way
-            if [ -f "./img/$way" ]
+            if [ -f "$database_path/$way" ]
             then
-                echo "./img/$way"
+                echo "$database_path/$way"
             elif [ -f "$way" ]
             then
                 echo "$way"
@@ -49,12 +54,6 @@ then
     elif [ $1 = -a ] || [ $1 = --automatic ]
     then
         #paramètres en fonction du mode automatique
-        if ! [ $3 ]
-        then
-            database_path=./img/
-        else
-            database_path=$3
-        fi
         ./list-file $database_path | ./img-search $image
     fi
 else
