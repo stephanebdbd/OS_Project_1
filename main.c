@@ -4,13 +4,17 @@
 #include <sys/wait.h>   // wait
 #include <string.h>     // strcmp & strlen
 #include <stdlib.h>     // exit
+#include <sys/mman.h>   // mmap
+#include <signal.h>     // signaux
+#include <sys/types.h>
 
 #define READ 0
 #define WRITE 1
+
 struct image{
-   const char* chemin;
-   const int* distance;
-}
+   char* chemin;
+   int distance;
+};
 
 int comparaison(const char* img, const char* imgcompare){
    int status;
@@ -38,28 +42,21 @@ int comparaison(const char* img, const char* imgcompare){
    return distance;
 }
 
-int main(int argc, char* argv[]) {
-   if (argc == 2 && strcmp(argv[0], "-v") != 0 && strlen(argv[1]) < 1000){
-      const char* imgPaths[1] = argv[1];
+void handler(int signal, pid_t *child){
+   if (signal == SIGINT){
+      kill(*child, SIGTERM);
+      exit(0);
    }
-   else {
-      printf("No similar image found (no comparison could be performed successfully).\n");
-      return 1;
+   else if (signal == SIGPIPE){
+      perror("Problème lors de la fermeture du pipe");
+      exit(0);
    }
-   
-   char buffer[1024][100];
+}
 
-   int taille = 0;
-   while (fgets(buffer[taille], sizeof(buffer[taille]), stdin) != NULL){
-      taille++;
-   } 
-   
-   if (taille==0){
-      printf("No similar image found (no comparison could be performed successfully).\n");
-      return 1;
-   }
-   
-   int taille = 1024;
+int main(int argc, char* argv[]) {
+   const char* imgPath = argv[argc-1];
+
+   int n = 1024;
    const int protection = PROT_READ | PROT_WRITE;
    // MAP_SHARED : Partager avec ses enfants
    // MAP_ANONYMOUS : Ne pas utiliser de fichier
@@ -67,7 +64,7 @@ int main(int argc, char* argv[]) {
 
     // Mapper la mémoire partagée dans l'espace d'adressage du processus
    
-   int *partage = (int *)mmap(NULL, n * sizeof(int), protection, visibility, -1, 0);
+   struct image *partage = (struct image *)mmap(NULL, n * sizeof(struct image), protection, visibility, -1, 0);
    if (partage == MAP_FAILED) {
       perror("mmap");
       exit(1);
@@ -95,10 +92,9 @@ int main(int argc, char* argv[]) {
       close(pipe2[WRITE]);
       char chemin_recu[100];
       while (read(pipe1[READ], &chemin_recu, sizeof(chemin_recu))){
-         int resultat =comparaison(imgPaths[1], chemin_recu);
-         partage[nb_img] = image(chemin_recu, resultat);
+         partage[nb_img].distance = comparaison(imgPath, chemin_recu);
+         partage[nb_img].chemin = chemin_recu;
          nb_img++;
-
       }
       close(pipe1[READ]);
       exit(0);
@@ -116,8 +112,8 @@ int main(int argc, char* argv[]) {
       close(pipe1[WRITE]);
       char chemin_recu[100];
       while (read(pipe2[READ], &chemin_recu, sizeof(chemin_recu))){
-         int resultat =comparaison(imgPaths[1], chemin_recu);
-         partage[nb_img] = image(chemin_recu, resultat);
+         partage[nb_img].distance = comparaison(imgPath, chemin_recu);
+         partage[nb_img].chemin = chemin_recu; 
          nb_img++;
       }
       close(pipe2[READ]);
@@ -127,29 +123,37 @@ int main(int argc, char* argv[]) {
    
    close(pipe1[READ]);
    close(pipe2[READ]);
-   
 
-   for (int i=0; i < taille; i++) {
-      if (i % 2 == 0){
-         write(pipe1[WRITE], &buffer[i], sizeof(buffer[i]));
+   int taille = 0;
+   char* chemin;
+   while (fgets(chemin, sizeof(chemin), stdin) != NULL){
+      taille++;
+      if (taille % 2 == 0){
+         write(pipe1[WRITE], &chemin, sizeof(chemin));
       }
       else {
-         write(pipe2[WRITE], &buffer[i], sizeof(buffer[i]));
+         write(pipe2[WRITE], &chemin, sizeof(chemin));
       }
+   } 
+   
+   if (taille==0){
+      printf("No similar image found (no comparison could be performed successfully).\n");
+      return 1;
    }
+   
    
    close(pipe1[WRITE]);
    close(pipe2[WRITE]);
 
    wait(NULL);
    wait(NULL);
-
-   int meilleur=image("pire",65);
+   
+   struct image meilleur = {"pire" , 65};
    // Afficher les valeurs depuis la mémoire partagée
-   for (int i = 0; i < n; i++) {
-      printf("Valeur à l'index %d : %d\n", i, partage[i]);
-      if meilleur.distance >partage[i].distance{
-         meilleur=partage[i]
+   for (int i = 0; i < taille; i++) {
+      printf("Valeur à l'index %d : %d au chemin %s\n", i, partage[i].distance, partage[i].chemin);
+      if (meilleur.distance > partage[i].distance){
+         meilleur=partage[i];
       }
    }
 
@@ -159,7 +163,10 @@ int main(int argc, char* argv[]) {
       exit(1);
    }
 
-   printf("Most similar image found: %s with a distance of %d\n.", meilleur.chemin,meilleur.distance)
+   signal(SIGPIPE, handler);
+   signal(SIGINT, handler);
+
+   printf("Most similar image found: %s with a distance of %d\n.", meilleur.chemin,meilleur.distance);
 
    return 0;
 }
