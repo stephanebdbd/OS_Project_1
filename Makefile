@@ -1,5 +1,5 @@
 CC=gcc
-OPT=-Wall -Wextra -std=c11 -O2
+OPT=-Wall -Wextra -std=gnu11 -O2
 OBJS=
 
 all: img-search
