@@ -7,6 +7,7 @@
 #include <sys/mman.h>   // mmap
 #include <signal.h>     // signaux
 #include <sys/types.h>
+#include <signal.h>
 
 #define READ 0
 #define WRITE 1
@@ -141,7 +142,7 @@ int main(int argc, char* argv[]) {
       return 1;
    }
    
-   
+
    close(pipe1[WRITE]);
    close(pipe2[WRITE]);
 
