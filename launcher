@@ -1,9 +1,17 @@
 #!/bin/bash
 
 #Le script lance img-search avec deux modes possibles: interactif et automatique pour lancer le programme.
-PATH="$PATH:./img:./img-dist"
+PATH="$PATH:$PWD/img-dist"
+chmod +x ./img-dist
+
 image=$2
 database_path=./img
+
+function capture_ctrl_d {
+    exit 0
+}
+
+trap 'capture_ctrl_d' EXIT
 
 if [ $# -eq 3 ] && [ -d "$3" ]
     then
@@ -39,7 +47,7 @@ then
     then
         #paramètres en fonction du mode interactif
         while true; do
-            read -p "Entrez le chemin d'accès d'une image (cliquez sur Enter pour quitter) : " way
+            read way
             if [ -f "$database_path/$way" ]
             then
                 echo "$database_path/$way"
