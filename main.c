@@ -43,13 +43,13 @@ int comparaison(const char* img, const char* imgcompare){
    return distance;
 }
 
-void handler(int signal, pid_t *child){
+void handler(int signal){
    if (signal == SIGINT){
-      kill(*child, SIGTERM);
+      perror("Fermeture des programmes");
       exit(0);
    }
    else if (signal == SIGPIPE){
-      perror("Problème lors de la fermeture du pipe");
+      perror("Fermeture du pipe");
       exit(0);
    }
 }
@@ -130,11 +130,15 @@ int main(int argc, char* argv[]) {
    while (fgets(chemin, sizeof(chemin), stdin) != NULL){
       taille++;
       if (taille % 2 == 0){
-         write(pipe1[WRITE], &chemin, sizeof(chemin));
-      }
+            if (write(pipe1[WRITE], &chemin, sizeof(chemin)) < 0) {
+               perror("Erreur lors de l'écriture dans le deuxième pipe");
+               exit(EXIT_FAILURE);
+         }      }
       else {
-         write(pipe2[WRITE], &chemin, sizeof(chemin));
-      }
+            if (write(pipe2[WRITE], &chemin, sizeof(chemin)) < 0) {
+               perror("Erreur lors de l'écriture dans le deuxième pipe");
+               exit(EXIT_FAILURE);
+         }      }
    } 
    
    if (taille==0){
