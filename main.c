@@ -8,14 +8,39 @@
 #define READ 0
 #define WRITE 1
 
+int comparaison(const char* img, const char* imgcompare){
+   int status;
+   int distance = -1;
+   pid_t process = fork();
+   if (process == -1){
+      perror("fork()");
+      exit(1);
+   }
+
+   int chem = execlp("img-dist", img, imgcompare, NULL);
+   if (chem == -1) {
+      perror("execlp");
+      exit(1);
+   }
+
+   if (wait(&status)){
+      distance = WEXITSTATUS(status);
+      printf("Distance entre %s et %s : %d", img, imgcompare, distance);
+   }
+   else{
+      perror("wait()");
+      exit(1);
+   }
+   return distance;
+}
+
 int main(int argc, char* argv[]) {
-   //char* imgPaths[1];
-   //imgPaths[0] = argv[0];
    if (argc == 2 && strcmp(argv[0], "-v") != 0 && strlen(argv[1]) < 1000){
-   //   imgPaths[0] = argv[1];
+      const char* imgPaths[1] = argv[1];
    }
    else {
-      return 0;
+      printf("No similar image found (no comparison could be performed successfully).\n");
+      return 1;
    }
    
    char buffer[1024][100];
@@ -52,7 +77,7 @@ int main(int argc, char* argv[]) {
       close(pipe2[WRITE]);
       char chemin_recu[100];
       while (read(pipe1[READ], &chemin_recu, sizeof(chemin_recu))){
-         printf("enfant 1 pid (%d) chemin : %s", getpid(), chemin_recu);
+//         printf("enfant 1 pid (%d) chemin : %s", getpid(), chemin_recu);
       }
       close(pipe1[READ]);
       exit(0);
@@ -70,7 +95,7 @@ int main(int argc, char* argv[]) {
       close(pipe1[WRITE]);
       char chemin_recu[100];
       while (read(pipe2[READ], &chemin_recu, sizeof(chemin_recu))){
-         printf("enfant 2 pid (%d) chemin : %s", getpid(), chemin_recu);
+//         printf("enfant 2 pid (%d) chemin : %s", getpid(), chemin_recu);
       }
       close(pipe2[READ]);
       exit(0);
