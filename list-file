@@ -11,7 +11,10 @@ else
         then
                 #si le dossier fourni est un chemin d'accès qui existe
                 #alors on liste le nom des fichiers qu'il contient
-                ls $1 -p | grep -v /
+                for file in "$1"/*
+                    do
+                    echo $file
+                done
         else
                 #sinon on renvoie un message d'erreur ainsi qu'on termine le code
                 echo "The specified path is not a directory"
