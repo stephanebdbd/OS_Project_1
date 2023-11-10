@@ -1,9 +1,10 @@
+#!/bin/bash
 
 #Le script liste le nom de chaque fichier présent dans un dossier donné en paramètre
 if [ $# != 1 ]
 then
         #si il n'y a pas d'argument ou trop d'argument spécifié alors on renvoie 
-#       #le message d'erreur et on termine le code
+        #le message d'erreur et on termine le code
         echo "Missing directory name"
         exit 1
 else
@@ -11,11 +12,10 @@ else
         then
                 #si le dossier fourni est un chemin d'accès qui existe
                 #alors on liste le nom des fichiers qu'il contient
-                for file in "$1"/*
-                do
-                    if [ -f $file ]
+                for file in "$1"/*; do
+                    if [ -f "$file" ]
                     then    
-                        echo $file
+                        echo "$file"
                     fi 
                 done
         else

@@ -15,6 +15,7 @@ fi
 if [ $# -lt 2 ] || [ $# -gt 3 ]
 then
     echo "No similar image found (no comparison could be performed successfully)."
+
 elif [ $1 = -h ] || [ $1 = --help ]
 then
     #paramètres en fonction du mode aide
@@ -30,33 +31,40 @@ then
     echo "  ./launcher -i image"
     echo "  ./launcher -a image ./img/"
     echo "  ./launcher --help"
+
 elif  [ -f "$image" ] || [ -f "$database_path/$image" ]
 then
     if [ -f "$database_path/$image" ]
     then
         image="$database_path/$image"
     fi
+
     if [ $1 = -i ] || [ $1 = --interactive ]
     then
         #paramètres en fonction du mode interactif
+
         while true; do
             read way
             if [ -f "$database_path/$way" ]
             then
                 echo "$database_path/$way"
+
             elif [ -f "$way" ]
             then
                 echo "$way"
+
             elif [ -z "$way" ]
             then
                 break
             fi
         done | ./img-search "$image"
+
     elif [ $1 = -a ] || [ $1 = --automatic ]
     then
         #paramètres en fonction du mode automatique
         ./list-file $database_path | ./img-search $image
     fi
+
 else
     echo "No similar image found (no comparison could be performed successfully)."
 fi

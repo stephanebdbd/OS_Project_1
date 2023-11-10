@@ -6,8 +6,6 @@
 #include <stdlib.h>     // exit
 #include <sys/mman.h>   // mmap
 #include <signal.h>     // signaux
-#include <sys/types.h>
-#include <signal.h>
 
 #define READ 0
 #define WRITE 1
@@ -18,30 +16,29 @@ struct image{
 };
 
 int comparaison(const char* img, const char* imgcompare){
-    int status;
-    pid_t pid = fork();
-    if (pid == -1){
+   int status;
+   pid_t pid = fork();
+   if (pid == -1){
       perror("fork");
       exit(1);
-    }
-    if (pid == 0){
+   }
+   if (pid == 0){
       if (execlp("./img-dist/img-dist", "-v", img, imgcompare, NULL) == -1) {
          perror("execlp");
          exit(1);
       }
-    }
-    else if (pid > 0){
-        wait(&status);
-        if (WIFEXITED(status)){
-        int chem = WEXITSTATUS(status);
-        return chem;
-        }
-        else{
-            perror("wait");
-            exit(1);
-        }
-    }
-    return 0;
+   }
+   else if (pid > 0){
+      wait(&status);
+      if (WIFEXITED(status)){
+         return WEXITSTATUS(status);
+      }
+      else{
+         perror("wait");
+         exit(1);
+      }
+   }
+   return 0;
 }
 
 void handler(int signal){
@@ -59,12 +56,8 @@ int main(int argc, char* argv[]) {
    const char* imgPath = argv[argc-1];
 
    const int protection = PROT_READ | PROT_WRITE;
-   // MAP_SHARED : Partager avec ses enfants
-   // MAP_ANONYMOUS : Ne pas utiliser de fichier
    const int visibility = MAP_SHARED | MAP_ANONYMOUS;
 
-    // Mapper la mémoire partagée dans l'espace d'adressage du processus
-   
    struct image *best = (struct image *)mmap(NULL, sizeof(struct image), protection, visibility, -1, 0);
    if (best == MAP_FAILED) {
       perror("mmap");
@@ -76,8 +69,7 @@ int main(int argc, char* argv[]) {
    int pipe1[2], pipe2[2];
    pid_t child1, child2;
 
-   if (pipe(pipe1) == -1 || pipe(pipe2) == -1)
-   {
+   if (pipe(pipe1) == -1 || pipe(pipe2) == -1) {
       perror("Erreur");
       exit(1);
    }
@@ -87,7 +79,7 @@ int main(int argc, char* argv[]) {
       perror("fork()");
       exit(1);
    }
-   
+
    if (child1 == 0){
       close(pipe1[WRITE]);
       close(pipe2[READ]);
@@ -118,15 +110,15 @@ int main(int argc, char* argv[]) {
       while (read(pipe2[READ], &chemin_recu, sizeof(chemin_recu))){
          int x = comparaison(imgPath, chemin_recu);
          if (best->distance > x){
-            strcpy(best->chemin, chemin_recu);
-            best->distance = x;
+         strcpy(best->chemin, chemin_recu);
+         best->distance = x;
          }
       }
       close(pipe2[READ]);
       exit(0);
       }
    }
-   
+
    close(pipe1[READ]);
    close(pipe2[READ]);
 
@@ -153,10 +145,9 @@ int main(int argc, char* argv[]) {
       printf("No similar image found (no comparison could be performed successfully).\n");
       return 1;
    }
-   
+
    printf("Most similar image found: '%s' with a distance of %d.\n", best->chemin, best->distance);
 
-   // Unmapping et nettoyage
    if (munmap(best, sizeof(int)) == -1) {
       perror("munmap");
       exit(1);
