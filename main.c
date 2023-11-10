@@ -57,8 +57,26 @@ void handler(int signal){
 }
 
 int main(int argc, char* argv[]) {
-   char* imgPath = argv[argc-1];
+   if (argc == 2 && strcmp(argv[0], "-v") != 0 && strlen(argv[1]) < 1000){
+      const char* imgPaths[1] = argv[1];
+   }
+   else {
+      printf("No similar image found (no comparison could be performed successfully).\n");
+      return 1;
+   }
+   
+   char buffer[1024][100];
 
+   int taille = 0;
+   while (fgets(buffer[taille], sizeof(buffer[taille]), stdin) != NULL){
+      taille++;
+   } 
+   
+   if (taille==0){
+      printf("No similar image found (no comparison could be performed successfully).\n");
+      return 1;
+   }
+   
    int n = 1024;
    const int protection = PROT_READ | PROT_WRITE;
    // MAP_SHARED : Partager avec ses enfants
@@ -73,20 +91,6 @@ int main(int argc, char* argv[]) {
       exit(1);
    }
 
-   int taille = 0;
-   char buffer[1024][100];
-   while (fgets(buffer[taille], sizeof(buffer[taille]), stdin) != NULL){
-      taille++;
-   }
-   
-   if (taille==0){
-      printf("No similar image found (no comparison could be performed successfully).\n");
-      return 1;
-   }
-
-   /*for (int j = 0; j<taille; j++) {
-      printf("Fichier n°%d : %s", j+1, buffer[j]);
-   }*/
 
    int pipe1[2], pipe2[2];
    pid_t child1, child2;
@@ -112,8 +116,8 @@ int main(int argc, char* argv[]) {
       while (read(pipe1[READ], &chemin_recu, sizeof(chemin_recu))){
          partage[nb_img].distance = comparaison(imgPath, chemin_recu);
          partage[nb_img].chemin = chemin_recu;
-         printf("Fichier : %s. Distance : %d.\n", partage[nb_img].chemin, partage[nb_img].distance);
          nb_img++;
+
       }
       close(pipe1[READ]);
       exit(0);
@@ -133,38 +137,32 @@ int main(int argc, char* argv[]) {
       while (read(pipe2[READ], &chemin_recu, sizeof(chemin_recu))){
          partage[nb_img].distance = comparaison(imgPath, chemin_recu);
          partage[nb_img].chemin = chemin_recu;
-         printf("Fichier : %s. Distance : %d.\n", partage[nb_img].chemin, partage[nb_img].distance);
          nb_img++;
       }
       close(pipe2[READ]);
       exit(0);
       }
    }
-
-   for (int i=0; i < taille; i++){
-      if (taille % 2 == 0){
-         if (write(pipe1[WRITE], &buffer[taille], sizeof(buffer[taille])) < 0) {
-            perror("Erreur lors de l'écriture dans le deuxième pipe");
-            exit(EXIT_FAILURE);
-         }
-      }
-      else {
-         if (write(pipe2[WRITE], &buffer[taille], sizeof(buffer[taille])) < 0) {
-            perror("Erreur lors de l'écriture dans le deuxième pipe");
-            exit(EXIT_FAILURE);
-         }
-      }
-   }
    
    close(pipe1[READ]);
    close(pipe2[READ]);
+   
 
+   for (int i=0; i < taille; i++) {
+      if (i % 2 == 0){
+         write(pipe1[WRITE], &buffer[i], sizeof(buffer[i]));
+      }
+      else {
+         write(pipe2[WRITE], &buffer[i], sizeof(buffer[i]));
+      }
+   }
+   
    close(pipe1[WRITE]);
    close(pipe2[WRITE]);
 
    wait(NULL);
    wait(NULL);
-   
+
    struct image meilleur = {partage[0].chemin, partage[0].distance};
    printf("Valeur à l'index %d : %d au chemin %s\n", 1, partage[0].distance, partage[0].chemin);
    // Afficher les valeurs depuis la mémoire partagée
@@ -184,7 +182,6 @@ int main(int argc, char* argv[]) {
    signal(SIGPIPE, handler);
    signal(SIGINT, handler);
 
-   printf("Most similar image found: %s with a distance of %d.\n", meilleur.chemin,meilleur.distance);
-
+   printf("Most similar image found: %s with a distance of %d\n.", meilleur.chemin,meilleur.distance);
    return 0;
 }
