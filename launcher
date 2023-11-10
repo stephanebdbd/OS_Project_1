@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #Le script lance img-search avec deux modes possibles: interactif et automatique pour lancer le programme.
-PATH="$PATH:$PWD/img-dist"
-chmod +x ./img-dist
+export PATH=$PATH:./img-dist/
+chmod +x "./img-dist/img-dist"
 
 image=$2
 database_path=./img
