@@ -17,27 +17,32 @@ struct image{
    int distance;
 };
 
-int comparaison(char* img, char* imgcompare){
-   pid_t process = fork();
-   if (process == -1){
-      perror("fork()");
-      exit(1);
-   }
-   if (process == 0){
-      int chem = execlp("./img-dist", img, imgcompare, NULL);
-      if (chem == -1) {
-         perror("execlp");
-         exit(1);
-      }
-      else {
-         printf("%d", chem);
-         return chem;
-      }
-   }
-
-   wait(NULL);
-
-   return 65;
+int comparaison(const char* img, const char* imgcompare){
+    int chem = 65, status;
+    pid_t pid = fork();
+    if (pid == 0){
+        if (execl("./img-dist", "img-dist", "-v", img, imgcompare, NULL) == -1) {
+            perror("execl");
+            exit(1);
+        }
+    }
+    else if (pid > 0){
+        waitpid(pid, &status, 0);
+        if (WIFEXITED(status)){
+        chem = WEXITSTATUS(status);
+        printf("%d\n", chem);
+        return chem;
+        }
+        else{
+            perror("wait");
+            exit(1);
+        }
+    }
+    else{
+        perror("fork");
+        exit(1);
+    }
+    return 0;
 }
 
 void handler(int signal){
@@ -107,6 +112,7 @@ int main(int argc, char* argv[]) {
       while (read(pipe1[READ], &chemin_recu, sizeof(chemin_recu))){
          partage[nb_img].distance = comparaison(imgPath, chemin_recu);
          partage[nb_img].chemin = chemin_recu;
+         printf("Fichier : %s. Distance : %d.\n", partage[nb_img].chemin, partage[nb_img].distance);
          nb_img++;
       }
       close(pipe1[READ]);
@@ -126,7 +132,8 @@ int main(int argc, char* argv[]) {
       char chemin_recu[100];
       while (read(pipe2[READ], &chemin_recu, sizeof(chemin_recu))){
          partage[nb_img].distance = comparaison(imgPath, chemin_recu);
-         partage[nb_img].chemin = chemin_recu; 
+         partage[nb_img].chemin = chemin_recu;
+         printf("Fichier : %s. Distance : %d.\n", partage[nb_img].chemin, partage[nb_img].distance);
          nb_img++;
       }
       close(pipe2[READ]);
@@ -139,7 +146,7 @@ int main(int argc, char* argv[]) {
          if (write(pipe1[WRITE], &buffer[taille], sizeof(buffer[taille])) < 0) {
             perror("Erreur lors de l'écriture dans le deuxième pipe");
             exit(EXIT_FAILURE);
-         }      
+         }
       }
       else {
          if (write(pipe2[WRITE], &buffer[taille], sizeof(buffer[taille])) < 0) {
@@ -177,7 +184,7 @@ int main(int argc, char* argv[]) {
    signal(SIGPIPE, handler);
    signal(SIGINT, handler);
 
-   printf("Most similar image found: %s with a distance of %d\n.", meilleur.chemin,meilleur.distance);
+   printf("Most similar image found: %s with a distance of %d.\n", meilleur.chemin,meilleur.distance);
 
    return 0;
 }
