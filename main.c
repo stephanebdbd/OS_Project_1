@@ -86,10 +86,10 @@ int main(int argc, char* argv[]) {
       close(pipe2[WRITE]);
       char chemin_recu[100];
       while (read(pipe1[READ], &chemin_recu, sizeof(chemin_recu))){
-         int x = comparaison(imgPath, chemin_recu);
-         if (best->distance > x){
+         int distance = comparaison(imgPath, chemin_recu);
+         if (best->distance > distance){
             strcpy(best->chemin, chemin_recu);
-            best->distance = x;
+            best->distance = distance;
          }
       }
       close(pipe1[READ]);
@@ -108,10 +108,10 @@ int main(int argc, char* argv[]) {
       close(pipe1[WRITE]);
       char chemin_recu[100];
       while (read(pipe2[READ], &chemin_recu, sizeof(chemin_recu))){
-         int x = comparaison(imgPath, chemin_recu);
-         if (best->distance > x){
+         int distance = comparaison(imgPath, chemin_recu);
+         if (best->distance > distance){
          strcpy(best->chemin, chemin_recu);
-         best->distance = x;
+         best->distance = distance;
          }
       }
       close(pipe2[READ]);
