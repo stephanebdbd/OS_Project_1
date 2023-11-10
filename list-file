@@ -12,8 +12,11 @@ else
                 #si le dossier fourni est un chemin d'accès qui existe
                 #alors on liste le nom des fichiers qu'il contient
                 for file in "$1"/*
-                    do
-                    echo $file
+                do
+                    if [ -f $file ]
+                    then    
+                        echo $file
+                    fi 
                 done
         else
                 #sinon on renvoie un message d'erreur ainsi qu'on termine le code
