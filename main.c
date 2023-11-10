@@ -146,14 +146,14 @@ int main(int argc, char* argv[]) {
    close(pipe1[WRITE]);
    close(pipe2[WRITE]);
 
-if (taille == 0) {
-    printf("No similar image found (no comparison could be performed successfully).\n");
-    return 1;
-}
-
    wait(NULL);
    wait(NULL);
 
+   if (taille == 0) {
+      printf("No similar image found (no comparison could be performed successfully).\n");
+      return 1;
+   }
+   
    printf("Most similar image found: '%s' with a distance of %d.\n", best->chemin, best->distance);
 
    // Unmapping et nettoyage
