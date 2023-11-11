@@ -5,7 +5,7 @@ export PATH=$PATH:$PWD/img-dist/
 chmod +x "$PWD/img-dist/img-dist"
 
 image=$2
-database_path=./img
+database_path=./img/
 
 if [ $# -eq 3 ] && [ -d "$3" ]
     then
