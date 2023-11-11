@@ -110,8 +110,8 @@ int main(int argc, char* argv[]) {
       while (read(pipe2[READ], &chemin_recu, sizeof(chemin_recu))){
          int distance = comparaison(imgPath, chemin_recu);
          if (best->distance > distance){
-         strcpy(best->chemin, chemin_recu);
-         best->distance = distance;
+            strcpy(best->chemin, chemin_recu);
+            best->distance = distance;
          }
       }
       close(pipe2[READ]);
