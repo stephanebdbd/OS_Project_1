@@ -12,12 +12,12 @@ else
         then
                 #si le dossier fourni est un chemin d'accès qui existe
                 #alors on liste le nom des fichiers qu'il contient
-                for file in "$1"/*; do
-                    if [ -f "$file" ]
+                for file in "$1"/*; do        #boucle sur chaque élément du dossier
+                    if [ -f "$file" ]      #vérifie si l'élément est un fichier, si oui on l'affiche en sortie
                     then    
                         echo "$file"
                     fi 
-                done
+                done        #fin de la boucle while
         else
                 #sinon on renvoie un message d'erreur ainsi qu'on termine le code
                 echo "The specified path is not a directory"
