@@ -4,19 +4,19 @@
 export PATH=$PATH:$PWD/img-dist/
 chmod +x "$PWD/img-dist/img-dist"
 
-image=$2
-database_path=./img/
+image=$2    #initialisation de la varibale image qui est le second argument donné
+database_path=./img/    #initialisation de database_path au dossier ./img/ par défaut
 
-if [ $# -eq 3 ] && [ -d "$3" ]
-    then
+if [ $# -eq 3 ] && [ -d "$3" ]  #si l'utilisateur précise un troisième argument et qu'il s'agit d'un chemin d'accès d'un dossier existant
+    then                           #alors database_path se réfère à ce troisième argument
     database_path=$3
 fi
 
-if [ $# -lt 2 ] || [ $# -gt 3 ]
-then
+if [ $# -lt 2 ] || [ $# -gt 3 ] #verification du nombre d'arguments, pas moins de deux arguments et pas plus de trois arguments
+then                            #sinon on renvoie ce message d'erreur
     echo "No similar image found (no comparison could be performed successfully)."
 
-elif [ $1 = -h ] || [ $1 = --help ]
+elif [ $1 = -h ] || [ $1 = --help ] #ajout d'un mode d'aide pour afficher toute les commandes possibles
 then
     #paramètres en fonction du mode aide
     echo "Usage: ./launcher [OPTION]... [IMAGE] [DATABASE_PATH]"
@@ -32,39 +32,38 @@ then
     echo "  ./launcher -a image ./img/"
     echo "  ./launcher --help"
 
-elif  [ -f "$image" ] || [ -f "$database_path/$image" ]
+elif  [ -f "$image" ] || [ -f "$database_path/$image" ] #on verifie si la variable image est bien un fichier existant
 then
-    if [ -f "$database_path/$image" ]
-    then
+    if [ -f "$database_path/$image" ]   #si l'image est un fichier du dossier database_path
+    then                                #alors la variable image va référer tous le chemin du fichier
         image="$database_path/$image"
     fi
 
-    if [ $1 = -i ] || [ $1 = --interactive ]
+    if [ $1 = -i ] || [ $1 = --interactive ]    #si le premier argument fait appel au mode interactif
     then
         #paramètres en fonction du mode interactif
+        while true; do  #boucle pour demander continuellement une image à l'utilisateur
+            read way    #input de l'utilisateur stocké dans la variable way
+            if [ -f "$database_path/$way" ] #si l'input de l'utilisateur
+            then                            #est un fichier qui existe dans le dossier databaase_path
+                echo "$database_path/$way"  #alors on renvoie le chemin d'accès du way
 
-        while true; do
-            read way
-            if [ -f "$database_path/$way" ]
-            then
-                echo "$database_path/$way"
-
-            elif [ -f "$way" ]
-            then
+            elif [ -f "$way" ]  #si l'input de l'utilisateur est un fichier
+            then                #on renvoie le chemin d'accès de way
                 echo "$way"
 
-            elif [ -z "$way" ]
-            then
+            elif [ -z "$way" ]  #si l'input de l'utilisateur est vide (il entre ENTER)
+            then                #alors on arrête la boucle
                 break
             fi
-        done | ./img-search "$image"
+        done | ./img-search "$image"    #transfert de tout ce qu'on renvoie vers le stdin de img search via un pipe
 
-    elif [ $1 = -a ] || [ $1 = --automatic ]
+    elif [ $1 = -a ] || [ $1 = --automatic ]    #si le premier argument fait appel au mode automatique
     then
         #paramètres en fonction du mode automatique
-        ./list-file $database_path | ./img-search $image
-    fi
+        ./list-file $database_path | ./img-search $image    #transfert de l'output de l'appel de list-file avec
+    fi                                                      #le database_path vers le stdin de l'appel de img search via un pipe
 
-else
+else    #si l'image donnée n'est pas un chemin d'accès vers un fichier qui existe, alors on renvoie le message d'erreur
     echo "No similar image found (no comparison could be performed successfully)."
 fi
