@@ -12,7 +12,7 @@
 
 struct image{char chemin[1000]; int distance;};
 
-int comparaison(const char* img, const char* imgcompare){
+int comparaison(const char* img1, const char* img2){
    int status;
    pid_t pid = fork();
    if (pid == -1){
@@ -20,7 +20,7 @@ int comparaison(const char* img, const char* imgcompare){
       exit(1);
    }
    if (pid == 0){
-      if (execlp("./img-dist/img-dist", "-v", img, imgcompare, NULL) == -1) {
+      if (execlp("./img-dist/img-dist", "-v", img1, img2, NULL) == -1) {
          perror("execlp");
          exit(1);
       }
