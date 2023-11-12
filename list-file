@@ -15,7 +15,7 @@ else
                 for file in "$1"/*; do        #boucle sur chaque élément du dossier
                     if [ -f "$file" ]      #vérifie si l'élément est un fichier, si oui on l'affiche en sortie
                     then    
-                        echo "$file"
+                        echo "$file"       #retourne le nom du fichier
                     fi 
                 done        #fin de la boucle while
         else
