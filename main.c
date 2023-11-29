@@ -112,7 +112,7 @@ void traitement(struct image* best, const char* imgPath, int *taille) {
    }
    close(pipe1[READ]);                                   //fermeture du descripteur de lecture du premier pipe 
    close(pipe2[READ]);                                   //fermeture du descripteur de lecture du second pipe
-   char chemin[1000];                                    //creation d'un tableau pour stocke chaque chemin sui sont des chaines de caractere
+   char chemin[1000];                                    //creation d'un tableau pour stocker le chemin d'accès
    while (fgets(chemin, sizeof(chemin), stdin) != NULL){ //lecture de chaque ligne en entree standard
       chemin[strlen(chemin)-1] = '\0';                   //pour pouvoir fait sizeof et indique la fin de la chaine de caractere
       if (*taille % 2 == 0){
@@ -123,7 +123,7 @@ void traitement(struct image* best, const char* imgPath, int *taille) {
       }
       ++*taille;                                         //incrementation de taille
    }
-   close(pipe1[WRITE]);                                  //fermeture du descripteur  d'ecriture du prmier pipe
+   close(pipe1[WRITE]);                                  //fermeture du descripteur  d'ecriture du premier pipe
    close(pipe2[WRITE]);                                  //fermeture du descripteur  d'ecriture du second pipe
    wait(NULL);                                           //attend la fin du premier processus fils1
    wait(NULL);                                           //attend la fin du second processus fils2

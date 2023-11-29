@@ -16,22 +16,6 @@ if [ $# -lt 2 ] || [ $# -gt 3 ] #verification du nombre d'arguments, pas moins d
 then                            #sinon on renvoie ce message d'erreur
     echo "No similar image found (no comparison could be performed successfully)."
 
-elif [ $1 = -h ] || [ $1 = --help ] #ajout d'un mode d'aide pour afficher toute les commandes possibles
-then
-    #paramètres en fonction du mode aide
-    echo "Usage: ./launcher [OPTION]... [IMAGE] [DATABASE_PATH]"
-    echo "Lance le programme img-search avec deux modes possibles: interactif et automatique."
-    echo "  -h, --help              Affiche l'aide et quitte"
-    echo "  -i, --interactive       Mode interactif"
-    echo "  -a, --automatic         Mode automatique"
-    echo "  IMAGE                   Chemin d'accès de l'image à comparer"
-    echo "  DATABASE_PATH           Chemin d'accès du dossier contenant les images à comparer"
-    echo "                          (par défaut: ./img/)"
-    echo "Exemples:"
-    echo "  ./launcher -i image"
-    echo "  ./launcher -a image ./img/"
-    echo "  ./launcher --help"
-
 elif  [ -f "$image" ] || [ -f "$database_path/$image" ] #on verifie si la variable image est bien un fichier existant
 then
     if [ -f "$database_path/$image" ]   #si l'image est un fichier du dossier database_path
