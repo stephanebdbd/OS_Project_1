@@ -50,7 +50,9 @@ This repository contains the implementation of an **Operating Systems project** 
 
 ## 👥 Contributors
 
-- **Chris Badi Budu** (Stéphane)
+- **Chris Badi Budu**
+- **Haytam Benouda**
+- **Marouane Anaim**
 
 ---
 
